@@ -1,5 +1,6 @@
 # Derafu: Container - Flexible Data Containers for PHP
 
+[![CI Workflow](https://github.com/derafu/container/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/derafu/container/actions/workflows/ci.yml?query=branch%3Amain)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 A collection of specialized PHP data containers that provide different levels of structure and validation, from simple bags to schema-validated stores.
