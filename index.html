@@ -1,1 +1,222 @@
-Soon.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Derafu: Container - Flexible Data Containers for PHP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown-light.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism.min.css" rel="stylesheet" />
+    <link href="https://derafu.org/foundation/css/styles.min.css" rel="stylesheet" />
+    </head>
+<body class="derafu-theme-earthstone">
+                <div id="header-container" class="sticky-top"></div>
+    
+            <main>
+            <div class="container py-4">
+    <div class="markdown-body"><h1><a id="content-derafu-container---flexible-data-containers-for-php" href="index.html#content-derafu-container---flexible-data-containers-for-php" class="text-decoration-none small text-muted" aria-hidden="true" title="Permalink"><i class="fa-solid fa-link"></i> </a>Derafu: Container - Flexible Data Containers for PHP</h1>
+<p><a rel="nofollow noopener noreferrer" target="_blank" class="external-link" href="https://github.com/derafu/container/actions/workflows/ci.yml?query=branch%3Amain"><img src="https://github.com/derafu/container/actions/workflows/ci.yml/badge.svg?branch=main&amp;event=push" alt="CI Workflow" /></a>
+<a rel="nofollow noopener noreferrer" target="_blank" class="external-link" href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" /></a></p>
+<p>A collection of specialized PHP data containers that provide different levels of structure and validation, from simple bags to schema-validated stores.</p>
+<h2><a id="content-features" href="index.html#content-features" class="text-decoration-none small text-muted" aria-hidden="true" title="Permalink"><i class="fa-solid fa-link"></i> </a>Features</h2>
+<ul>
+<li>🎯 Purpose-built containers for different needs.</li>
+<li>🔍 JSON Schema validation support.</li>
+<li>📦 Simple to complex data structures.</li>
+<li>🔄 Sequential data handling.</li>
+<li>🛡️ Type-safe operations.</li>
+<li>🧩 Common interface across containers.</li>
+<li>🪶 Minimal dependencies.</li>
+<li>🧪 Comprehensive test coverage.</li>
+</ul>
+<h2><a id="content-why-derafucontainer" href="index.html#content-why-derafucontainer" class="text-decoration-none small text-muted" aria-hidden="true" title="Permalink"><i class="fa-solid fa-link"></i> </a>Why Derafu\Container?</h2>
+<p>Unlike generic data structures, Derafu\Container provides specialized containers each designed for specific use cases:</p>
+<ul>
+<li><strong>Bag</strong>: Simple, flexible data storage without restrictions.</li>
+<li><strong>Vault</strong>: Basic structured data with validation.</li>
+<li><strong>Store</strong>: Advanced data validation using JSON Schema.</li>
+<li><strong>Journal</strong>: Sequential data storage with LIFO access.</li>
+</ul>
+<h2><a id="content-installation" href="index.html#content-installation" class="text-decoration-none small text-muted" aria-hidden="true" title="Permalink"><i class="fa-solid fa-link"></i> </a>Installation</h2>
+<p>Install via Composer:</p>
+<pre><code class="language-bash">composer require derafu/container
+</code></pre>
+<h2><a id="content-basic-usage" href="index.html#content-basic-usage" class="text-decoration-none small text-muted" aria-hidden="true" title="Permalink"><i class="fa-solid fa-link"></i> </a>Basic Usage</h2>
+<h3><a id="content-bag---flexible-container" href="index.html#content-bag---flexible-container" class="text-decoration-none small text-muted" aria-hidden="true" title="Permalink"><i class="fa-solid fa-link"></i> </a>Bag - Flexible Container</h3>
+<pre><code class="language-php">use Derafu\Container\Bag;
+
+$bag = new Bag();
+$bag-&gt;set('user.name', 'John');
+$bag-&gt;set('user.email', 'john@example.com');
+
+echo $bag-&gt;get('user.name'); // &quot;John&quot;
+</code></pre>
+<h3><a id="content-vault---structured-container" href="index.html#content-vault---structured-container" class="text-decoration-none small text-muted" aria-hidden="true" title="Permalink"><i class="fa-solid fa-link"></i> </a>Vault - Structured Container</h3>
+<pre><code class="language-php">use Derafu\Container\Vault;
+
+$vault = new Vault([], [
+    'user' =&gt; [
+        'type' =&gt; 'array',
+        'required' =&gt; true,
+        'schema' =&gt; [
+            'name' =&gt; ['type' =&gt; 'string'],
+            'age' =&gt; ['type' =&gt; 'integer'],
+        ],
+    ],
+]);
+
+$vault-&gt;set('user', [
+    'name' =&gt; 'John',
+    'age' =&gt; 30,
+]);
+</code></pre>
+<h3><a id="content-store---json-schema-container" href="index.html#content-store---json-schema-container" class="text-decoration-none small text-muted" aria-hidden="true" title="Permalink"><i class="fa-solid fa-link"></i> </a>Store - JSON Schema Container</h3>
+<pre><code class="language-php">use Derafu\Container\Store;
+
+$schema = [
+    'type' =&gt; 'object',
+    'properties' =&gt; [
+        'user' =&gt; [
+            'type' =&gt; 'object',
+            'required' =&gt; ['name', 'email'],
+            'properties' =&gt; [
+                'name' =&gt; ['type' =&gt; 'string'],
+                'email' =&gt; ['type' =&gt; 'string', 'format' =&gt; 'email'],
+            ],
+        ],
+    ],
+];
+
+$store = new Store([], $schema);
+$store-&gt;set('user', [
+    'name' =&gt; 'John',
+    'email' =&gt; 'john@example.com',
+]);
+</code></pre>
+<h3><a id="content-journal---sequential-container" href="index.html#content-journal---sequential-container" class="text-decoration-none small text-muted" aria-hidden="true" title="Permalink"><i class="fa-solid fa-link"></i> </a>Journal - Sequential Container</h3>
+<pre><code class="language-php">use Derafu\Container\Journal;
+
+$journal = new Journal();
+$journal-&gt;add('First Entry');
+$journal-&gt;add('Second Entry');
+
+print_r($journal-&gt;reverse()); // Shows entries newest first.
+</code></pre>
+<h2><a id="content-container-comparison" href="index.html#content-container-comparison" class="text-decoration-none small text-muted" aria-hidden="true" title="Permalink"><i class="fa-solid fa-link"></i> </a>Container Comparison</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Bag</th>
+<th>Vault</th>
+<th>Store</th>
+<th>Journal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Schema</td>
+<td>No</td>
+<td>Simple</td>
+<td>JSON</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>No</td>
+<td>Basic</td>
+<td>Full</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Nested Data</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Sequential</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Dot Notation</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<h2><a id="content-common-interface" href="index.html#content-common-interface" class="text-decoration-none small text-muted" aria-hidden="true" title="Permalink"><i class="fa-solid fa-link"></i> </a>Common Interface</h2>
+<p>All containers implement <code>ContainerInterface</code>:</p>
+<pre><code class="language-php">interface ContainerInterface extends ArrayAccess
+{
+    public function set(string $key, mixed $value): static;
+    public function get(string $key, mixed $default = null): mixed;
+    public function has(string $key): bool;
+    public function clear(?string $key = null): void;
+}
+</code></pre>
+<h2><a id="content-advanced-usage" href="index.html#content-advanced-usage" class="text-decoration-none small text-muted" aria-hidden="true" title="Permalink"><i class="fa-solid fa-link"></i> </a>Advanced Usage</h2>
+<h3><a id="content-custom-validation-in-vault" href="index.html#content-custom-validation-in-vault" class="text-decoration-none small text-muted" aria-hidden="true" title="Permalink"><i class="fa-solid fa-link"></i> </a>Custom Validation in Vault</h3>
+<pre><code class="language-php">use Derafu\Container\Vault;
+
+$vault = new Vault([], [
+    'age' =&gt; [
+        'type' =&gt; 'integer',
+        'validator' =&gt; fn ($value) =&gt; $value &gt;= 18
+    ]
+]);
+</code></pre>
+<h3><a id="content-complex-json-schema-in-store" href="index.html#content-complex-json-schema-in-store" class="text-decoration-none small text-muted" aria-hidden="true" title="Permalink"><i class="fa-solid fa-link"></i> </a>Complex JSON Schema in Store</h3>
+<pre><code class="language-php">use Derafu\Container\Store;
+
+$store = new Store([], [
+    'type' =&gt; 'object',
+    'properties' =&gt; [
+        'users' =&gt; [
+            'type' =&gt; 'array',
+            'items' =&gt; [
+                'type' =&gt; 'object',
+                'required' =&gt; ['id', 'name'],
+                'properties' =&gt; [
+                    'id' =&gt; ['type' =&gt; 'integer'],
+                    'name' =&gt; ['type' =&gt; 'string'],
+                    'email' =&gt; ['type' =&gt; 'string', 'format' =&gt; 'email'],
+                ],
+            ],
+        ],
+    ],
+]);
+</code></pre>
+<h3><a id="content-journal-with-filtering" href="index.html#content-journal-with-filtering" class="text-decoration-none small text-muted" aria-hidden="true" title="Permalink"><i class="fa-solid fa-link"></i> </a>Journal with Filtering</h3>
+<pre><code class="language-php">use Derafu\Container\Journal;
+
+$journal = new Journal();
+$journal-&gt;add(['level' =&gt; 'info', 'message' =&gt; 'System started']);
+$journal-&gt;add(['level' =&gt; 'error', 'message' =&gt; 'Connection failed']);
+
+$errors = array_filter($journal-&gt;reverse(), fn($entry) =&gt;
+    $entry['level'] === 'error'
+);
+</code></pre>
+<h2><a id="content-contributing" href="index.html#content-contributing" class="text-decoration-none small text-muted" aria-hidden="true" title="Permalink"><i class="fa-solid fa-link"></i> </a>Contributing</h2>
+<p>Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.</p>
+<h2><a id="content-license" href="index.html#content-license" class="text-decoration-none small text-muted" aria-hidden="true" title="Permalink"><i class="fa-solid fa-link"></i> </a>License</h2>
+<p>This package is open-sourced software licensed under the <a rel="nofollow noopener noreferrer" target="_blank" class="external-link" href="https://opensource.org/licenses/MIT">MIT license</a>.</p>
+</div>
+</div>
+        </main>
+    
+            <div id="footer-container"></div>
+<script src="https://derafu.org/foundation/js/derafu.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    </body>
+</html>
