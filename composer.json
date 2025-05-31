@@ -27,7 +27,8 @@
     "require": {
         "php": "^8.3",
         "doctrine/collections": "^2.2",
-        "derafu/selector": "dev-main"
+        "derafu/selector": "dev-main",
+        "symfony/options-resolver": "^7.3"
     },
     "require-dev": {
         "ext-xdebug": "*",
