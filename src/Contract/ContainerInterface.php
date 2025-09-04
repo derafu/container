@@ -15,11 +15,12 @@ namespace Derafu\Container\Contract;
 use ArrayAccess;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
+use JsonSerializable;
 
 /**
  * Interfaz base para todos los almacenamientos.
  */
-interface ContainerInterface extends ArrayAccess
+interface ContainerInterface extends ArrayAccess, JsonSerializable
 {
     /**
      * Obtiene la colección de los datos almacenados.

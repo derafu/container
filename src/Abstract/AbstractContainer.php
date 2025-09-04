@@ -165,4 +165,12 @@ abstract class AbstractContainer implements ContainerInterface
     {
         return $this->data->toArray();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
+    }
 }
