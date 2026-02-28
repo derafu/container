@@ -22,12 +22,12 @@ use InvalidArgumentException;
 use Traversable;
 
 /**
- * Clase base para todos los almacenamientos.
+ * Base class for all storage implementations.
  */
 abstract class AbstractContainer implements ContainerInterface
 {
     /**
-     * Colección de datos almacenados.
+     * Stored data collection.
      *
      * @var ArrayCollection
      */
@@ -132,11 +132,10 @@ abstract class AbstractContainer implements ContainerInterface
     }
 
     /**
-     * Crea una nueva instancia de ArrayCollection, para usar o asignar a la
-     * propiedad $data de la clase.
+     * Creates a new ArrayCollection for use or assignment to $data.
      *
-     * @param array|ArrayAccess|ArrayObject $data
-     * @return ArrayCollection
+     * @param array|ArrayAccess|ArrayObject $data Source data.
+     * @return ArrayCollection New collection instance.
      */
     protected function createFrom(
         array|ArrayAccess|ArrayObject $data
@@ -157,9 +156,9 @@ abstract class AbstractContainer implements ContainerInterface
     }
 
     /**
-     * Entrega los elementos de $data como arreglo.
+     * Returns the elements of $data as an array.
      *
-     * @return array
+     * @return array Data as array.
      */
     protected function toArray(): array
     {

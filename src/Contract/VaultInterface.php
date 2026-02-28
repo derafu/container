@@ -15,31 +15,31 @@ namespace Derafu\Container\Contract;
 use Exception;
 
 /**
- * Interfaz para contenedor de datos estructurados con schema.
+ * Interface for structured data container with schema.
  */
 interface VaultInterface extends ContainerInterface
 {
     /**
-     * Asigna el schema que se usará para validar los datos.
+     * Sets the schema used to validate data.
      *
-     * @param array $schema Nuevo schema a utilizar.
-     * @return static Permite encadenar métodos.
+     * @param array $schema New schema to use.
+     * @return static Allows method chaining.
      */
     public function setSchema(array $schema): static;
 
     /**
-     * Obtiene el schema de datos definido.
+     * Returns the defined data schema.
      *
-     * @return array Schema actual.
+     * @return array Current schema.
      */
     public function getSchema(): array;
 
     /**
-     * Valida que los datos almacenados cumplan con el schema.
+     * Validates that stored data complies with the schema.
      *
-     * @param bool $allowUndefinedKeys Permitir o no índices no definidos.
+     * @param bool $allowUndefinedKeys Whether to allow undefined keys.
      * @return void
-     * @throws Exception Lanzará una excepción si ocurre algún error.
+     * @throws Exception Thrown when validation fails.
      */
     public function validate(bool $allowUndefinedKeys = false): void;
 }

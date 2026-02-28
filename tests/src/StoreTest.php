@@ -20,6 +20,11 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Store::class)]
 class StoreTest extends TestCase
 {
+    /**
+     * Provides test cases from fixtures for schema validation.
+     *
+     * @return array<string, array{0: array, 1: array, 2: array|string}>
+     */
     public static function provideTestCases(): array
     {
         $tests = require __DIR__ . '/../fixtures/store.php';
@@ -37,6 +42,11 @@ class StoreTest extends TestCase
         return $testCases;
     }
 
+    /**
+     * Tests schema getter and setter.
+     *
+     * @return void
+     */
     public function testStoreSchemaGetterAndSetter(): void
     {
         $schema = [
@@ -64,6 +74,14 @@ class StoreTest extends TestCase
         $this->assertSame($expected, $container->getSchema());
     }
 
+    /**
+     * Tests store with fixture data and schema.
+     *
+     * @param array $data Input data.
+     * @param array $schema JSON schema.
+     * @param array|string $expected Expected values or exception class.
+     * @return void
+     */
     #[DataProvider('provideTestCases')]
     public function testStoreCase(
         array $data,

@@ -18,70 +18,70 @@ use Doctrine\Common\Collections\Criteria;
 use JsonSerializable;
 
 /**
- * Interfaz base para todos los almacenamientos.
+ * Base interface for all storage implementations.
  */
 interface ContainerInterface extends ArrayAccess, JsonSerializable
 {
     /**
-     * Obtiene la colección de los datos almacenados.
+     * Returns the collection of stored data.
      *
-     * @return ArrayCollection Colección con todos los valores almacenados.
+     * @return ArrayCollection Collection of all stored values.
      */
     public function collection(): ArrayCollection;
 
     /**
-     * Obtiene todos los valores almacenados.
+     * Returns all stored values.
      *
-     * @return array Arreglo con todos los valores almacenados.
+     * @return array Array of all stored values.
      */
     public function all(): array;
 
     /**
-     * Asigna un valor a una llave.
+     * Sets a value for a key.
      *
-     * @param string $key Llave donde se almacenará el valor.
-     * @param mixed $value Valor que se desea almacenar.
-     * @return static Permite encadenar métodos.
+     * @param string $key Key where the value will be stored.
+     * @param mixed $value Value to store.
+     * @return static Allows method chaining.
      */
     public function set(string $key, mixed $value): static;
 
     /**
-     * Obtiene un valor almacenado.
+     * Returns a stored value.
      *
-     * @param string $key Llave del valor que se desea obtener.
-     * @param mixed $default Valor por defecto si la llave no existe.
-     * @return mixed Valor almacenado o valor por defecto.
+     * @param string $key Key of the value to retrieve.
+     * @param mixed $default Default value when key does not exist.
+     * @return mixed Stored value or default.
      */
     public function get(string $key, mixed $default = null): mixed;
 
     /**
-     * Verifica si existe un valor para una llave.
+     * Checks whether a value exists for a key.
      *
-     * @param string $key Llave que se desea verificar.
-     * @return bool True si la llave existe, false en caso contrario.
+     * @param string $key Key to check.
+     * @return bool True if key exists, false otherwise.
      */
     public function has(string $key): bool;
 
     /**
-     * Elimina todos los valores almacenados o uno en particular.
+     * Clears all stored values or a specific one.
      *
-     * @param string|null $key Llave que se desea eliminar.
+     * @param string|null $key Key to remove, or null for all.
+     * @return void
      */
     public function clear(?string $key = null): void;
 
     /**
-     * Aplica un criterio para filtrar los elementos almacenados.
+     * Applies criteria to filter stored elements.
      *
-     * Este método permite filtrar y ordenar los elementos en la colección de
-     * acuerdo a las condiciones definidas en un objeto `Criteria`.
+     * Filters and orders elements in the collection according to the
+     * conditions defined in a Criteria object.
      *
-     * El resultado es una nueva colección (`ArrayCollection`) que contiene
-     * únicamente los elementos que cumplen con las condiciones.
+     * Returns a new ArrayCollection containing only elements that match.
      *
-     * @param Criteria $criteria El objeto `Criteria` que define las
-     * condiciones, el orden y los límites de los resultados.
-     * @return ArrayCollection Una nueva colección con los elementos que cumplen
-     * el criterio especificado.
+     * @param Criteria $criteria The Criteria defining conditions, order and
+     * limits for the results.
+     * @return ArrayCollection New collection with elements matching the
+     * criteria.
      * @see \Doctrine\Common\Collections\Criteria
      * @see \Doctrine\Common\Collections\ArrayCollection
      */

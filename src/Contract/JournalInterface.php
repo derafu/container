@@ -13,22 +13,22 @@ declare(strict_types=1);
 namespace Derafu\Container\Contract;
 
 /**
- * Interfaz para almacenamiento secuencial de elementos.
+ * Interface for sequential storage of elements.
  */
 interface JournalInterface extends ContainerInterface
 {
     /**
-     * Agrega un elemento al final del journal.
+     * Appends an item to the end of the journal.
      *
-     * @param mixed $item Elemento a agregar
-     * @return static Permite encadenar métodos.
+     * @param mixed $item Item to add.
+     * @return static Allows method chaining.
      */
     public function add(mixed $item): static;
 
     /**
-     * Obtiene los elementos en orden inverso (del más nuevo al más antiguo).
+     * Returns elements in reverse order (newest to oldest).
      *
-     * @return array
+     * @return array Elements in reverse order.
      */
     public function reverse(): array;
 }

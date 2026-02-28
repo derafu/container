@@ -16,32 +16,32 @@ use ArrayAccess;
 use ArrayObject;
 
 /**
- * Interfaz para contenedor simple de datos.
+ * Interface for simple data container.
  */
 interface BagInterface extends ContainerInterface
 {
     /**
-     * Reemplaza todos los valores almacenados por nuevos valores.
+     * Replaces all stored values with new ones.
      *
-     * @param array|ArrayAccess|ArrayObject $data Nuevos valores a almacenar.
-     * @return static Permite encadenar métodos.
+     * @param array|ArrayAccess|ArrayObject $data New values to store.
+     * @return static Allows method chaining.
      */
     public function replace(array|ArrayAccess|ArrayObject $data): static;
 
     /**
-     * Combina los valores almacenados con nuevos valores.
+     * Merges stored values with new values.
      *
-     * @param array|ArrayAccess|ArrayObject $data Valores a combinar con los
-     * existentes.
-     * @return static Permite encadenar métodos.
+     * @param array|ArrayAccess|ArrayObject $data Values to merge with
+     * existing ones.
+     * @return static Allows method chaining.
      */
     public function merge(array|ArrayAccess|ArrayObject $data): static;
 
     /**
-     * Elimina un valor almacenado.
+     * Removes a stored value.
      *
-     * @param string $key Llave del valor que se desea eliminar.
-     * @return static Permite encadenar métodos.
+     * @param string $key Key of the value to remove.
+     * @return static Allows method chaining.
      */
     public function remove(string $key): static;
 }

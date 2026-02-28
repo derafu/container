@@ -23,29 +23,29 @@ use Opis\JsonSchema\Validator;
 use stdClass;
 
 /**
- * Clase para contenedor de datos estructurados con JSON Schema.
+ * Structured data container with JSON Schema support.
  */
 class Store extends AbstractContainer implements StoreInterface
 {
     /**
-     * Configuración del schema de datos.
+     * Data schema configuration.
      *
      * @var stdClass
      */
     protected ?stdClass $schema = null;
 
     /**
-     * Instancia que representa el formateador de los errores del validador.
+     * Validator error formatter instance.
      *
      * @var ErrorFormatter
      */
     private ErrorFormatter $formatter;
 
     /**
-     * Constructor del contenedor.
+     * Constructor.
      *
-     * @param array|ArrayAccess|ArrayObject $data Datos iniciales.
-     * @param array $schema Schema inicial.
+     * @param array|ArrayAccess|ArrayObject $data Initial data.
+     * @param array $schema Initial schema.
      */
     public function __construct(
         array|ArrayAccess|ArrayObject $data = [],
@@ -92,11 +92,11 @@ class Store extends AbstractContainer implements StoreInterface
     }
 
     /**
-     * Valida y resuelve datos usando un schema JSON.
+     * Validates and resolves data using a JSON schema.
      *
-     * @param array $data Datos a validar.
-     * @param stdClass $schema Schema JSON a usar.
-     * @return array Datos validados y con valores por defecto aplicados.
+     * @param array $data Data to validate.
+     * @param stdClass $schema JSON schema to use.
+     * @return array Validated data with defaults applied.
      */
     private function resolve(array $data, stdClass $schema): array
     {
@@ -127,11 +127,11 @@ class Store extends AbstractContainer implements StoreInterface
     }
 
     /**
-     * Aplica valores por defecto recursivamente.
+     * Applies default values recursively.
      *
-     * @param array $data Datos a procesar.
-     * @param stdClass $schema Schema con valores por defecto.
-     * @return array Datos con valores por defecto aplicados.
+     * @param array $data Data to process.
+     * @param stdClass $schema Schema with default values.
+     * @return array Data with defaults applied.
      */
     private function applyDefaults(array $data, stdClass $schema): array
     {

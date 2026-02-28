@@ -18,14 +18,14 @@ use Derafu\Container\Abstract\AbstractContainer;
 use Derafu\Container\Contract\BagInterface;
 
 /**
- * Clase para contenedor simple de datos.
+ * Simple data container implementation.
  */
 class Bag extends AbstractContainer implements BagInterface
 {
     /**
-     * Constructor del contenedor.
+     * Constructor.
      *
-     * @param array|ArrayAccess|ArrayObject $data Datos iniciales
+     * @param array|ArrayAccess|ArrayObject $data Initial data.
      */
     public function __construct(array|ArrayAccess|ArrayObject $data = [])
     {

@@ -27,6 +27,11 @@ use Traversable;
 #[CoversClass(Vault::class)]
 class VaultTest extends TestCase
 {
+    /**
+     * Provides test cases from fixtures for schema validation.
+     *
+     * @return array<string, array{0: array, 1: array, 2: array|string}>
+     */
     public static function provideTestCases(): array
     {
         $tests = require __DIR__ . '/../fixtures/vault.php';
@@ -44,6 +49,11 @@ class VaultTest extends TestCase
         return $testCases;
     }
 
+    /**
+     * Tests schema getter and setter.
+     *
+     * @return void
+     */
     public function testVaultSchemaGetterAndSetter(): void
     {
         $schema = [
@@ -57,6 +67,14 @@ class VaultTest extends TestCase
         $this->assertSame($schema, $container->getSchema());
     }
 
+    /**
+     * Tests vault with fixture data and schema.
+     *
+     * @param array $data Input data.
+     * @param array $schema Schema configuration.
+     * @param array|string $expected Expected values or exception class.
+     * @return void
+     */
     #[DataProvider('provideTestCases')]
     public function testVaultCase(
         array $data,
@@ -67,8 +85,6 @@ class VaultTest extends TestCase
             $this->expectException($expected);
         }
 
-        // Se deben resolver los normalizadores porque se pasan como string
-        // desde el caso de prueba y deben ser closure para DataContainer.
         $this->resolveNormalizers($schema);
 
         $container = new Vault($data, $schema);
@@ -78,6 +94,12 @@ class VaultTest extends TestCase
         }
     }
 
+    /**
+     * Resolves normalizer strings to closures in schema.
+     *
+     * @param array<string, mixed> $schema Schema by reference.
+     * @return void
+     */
     private function resolveNormalizers(&$schema): void
     {
         foreach ($schema as $key => &$rules) {
@@ -92,6 +114,12 @@ class VaultTest extends TestCase
         }
     }
 
+    /**
+     * Resolves a normalizer name to a closure.
+     *
+     * @param string $normalizer Normalizer name.
+     * @return Closure Normalizer closure.
+     */
     private function resolveNormalizer($normalizer): Closure
     {
         switch ($normalizer) {
@@ -102,8 +130,11 @@ class VaultTest extends TestCase
         }
     }
 
-    // Prueba básica para asegurar que un array simple se convierta
-    // correctamente.
+    /**
+     * Tests that a simple array is converted correctly.
+     *
+     * @return void
+     */
     public function testVaultInDataContainerWithArray(): void
     {
         $data = ['key1' => 'value1', 'key2' => 'value2'];
@@ -112,11 +143,15 @@ class VaultTest extends TestCase
         $this->assertSame(
             $data,
             $container->all(),
-            'Error al convertir desde un array.'
+            'Failed to convert from array.'
         );
     }
 
-    // Prueba con un ArrayObject estándar.
+    /**
+     * Tests conversion from standard ArrayObject.
+     *
+     * @return void
+     */
     public function testVaultInDataContainerWithArrayObject(): void
     {
         $data = new ArrayObject(['key1' => 'value1', 'key2' => 'value2']);
@@ -125,11 +160,15 @@ class VaultTest extends TestCase
         $this->assertSame(
             ['key1' => 'value1', 'key2' => 'value2'],
             $container->all(),
-            'Error al convertir desde ArrayObject.'
+            'Failed to convert from ArrayObject.'
         );
     }
 
-    // Prueba con una clase personalizada que implemente ambas interfaces.
+    /**
+     * Tests conversion from custom ArrayAccess and Traversable implementation.
+     *
+     * @return void
+     */
     public function testVaultInDataContainerWithArrayAccess(): void
     {
         $data = new MyArrayAccess();
@@ -138,11 +177,14 @@ class VaultTest extends TestCase
         $this->assertSame(
             ['key1' => 'value1', 'key2' => 'value2'],
             $container->all(),
-            'Error al convertir desde un ArrayAccess/Traversable.'
+            'Failed to convert from ArrayAccess/Traversable.'
         );
     }
 }
 
+/**
+ * Test double implementing ArrayAccess and IteratorAggregate.
+ */
 class MyArrayAccess implements ArrayAccess, IteratorAggregate
 {
     private array $container = ['key1' => 'value1', 'key2' => 'value2'];

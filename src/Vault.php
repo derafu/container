@@ -20,23 +20,23 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Clase para contenedor de datos estructurados con schema.
+ * Structured data container with schema support.
  */
 class Vault extends AbstractContainer implements VaultInterface
 {
     /**
-     * Configuración del schema de datos.
+     * Data schema configuration.
      *
      * @var array
      */
     protected array $schema = [];
 
     /**
-     * Constructor del contenedor.
+     * Constructor.
      *
-     * @param array|ArrayAccess|ArrayObject $data Datos iniciales.
-     * @param array $schema Schema inicial.
-     * @param bool $allowUndefinedKeys Permitir o no índices no definidos.
+     * @param array|ArrayAccess|ArrayObject $data Initial data.
+     * @param array $schema Initial schema.
+     * @param bool $allowUndefinedKeys Whether to allow undefined keys.
      */
     public function __construct(
         array|ArrayAccess|ArrayObject $data = [],
@@ -78,12 +78,12 @@ class Vault extends AbstractContainer implements VaultInterface
     }
 
     /**
-     * Valida datos usando un esquema específico.
+     * Validates and resolves data using a schema.
      *
-     * @param array $data Datos a validar.
-     * @param array $schema Esquema a usar.
-     * @param bool $allowUndefinedKeys Permitir o no índices no definidos.
-     * @return array Datos validados y normalizados.
+     * @param array $data Data to validate.
+     * @param array $schema Schema to use.
+     * @param bool $allowUndefinedKeys Whether to allow undefined keys.
+     * @return array Validated and normalized data.
      */
     private function resolve(
         array $data,

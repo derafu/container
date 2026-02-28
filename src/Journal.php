@@ -18,14 +18,14 @@ use Derafu\Container\Abstract\AbstractContainer;
 use Derafu\Container\Contract\JournalInterface;
 
 /**
- * Clase para almacenamiento secuencial de elementos.
+ * Sequential storage of elements.
  */
 class Journal extends AbstractContainer implements JournalInterface
 {
     /**
-     * Constructor del Journal.
+     * Constructor.
      *
-     * @param array|ArrayAccess|ArrayObject $data Datos iniciales del journal.
+     * @param array|ArrayAccess|ArrayObject $data Initial journal data.
      */
     public function __construct(array|ArrayAccess|ArrayObject $data = [])
     {

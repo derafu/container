@@ -22,31 +22,43 @@ class JournalTest extends TestCase
 {
     private Journal $journal;
 
+    /**
+     * Sets up the test fixture.
+     *
+     * @return void
+     */
     protected function setUp(): void
     {
         $this->journal = new Journal();
     }
 
+    /**
+     * Tests adding and retrieving elements in normal and reverse order.
+     *
+     * @return void
+     */
     public function testJournalAddAndRetrieveElements(): void
     {
-        // Agregar elementos.
         $this->journal->add('first');
         $this->journal->add('second');
         $this->journal->add('third');
 
-        // Verificar orden normal (más antiguo a más nuevo).
         $this->assertSame(
             ['first', 'second', 'third'],
             $this->journal->all()
         );
 
-        // Verificar orden inverso (más nuevo a más antiguo).
         $this->assertSame(
             ['third', 'second', 'first'],
             $this->journal->reverse()
         );
     }
 
+    /**
+     * Tests clearing the journal.
+     *
+     * @return void
+     */
     public function testJournalClearJournal(): void
     {
         $this->journal->add('item');
@@ -55,6 +67,11 @@ class JournalTest extends TestCase
         $this->assertSame([], $this->journal->all());
     }
 
+    /**
+     * Tests journal with different value types.
+     *
+     * @return void
+     */
     public function testJournalJournalWithDifferentTypes(): void
     {
         $object = new stdClass();
