@@ -25,17 +25,17 @@
         }
     },
     "require": {
-        "php": "^8.3",
-        "doctrine/collections": "^2.2",
+        "php": "^8.5",
+        "doctrine/collections": "^2.6",
         "derafu/selector": "dev-main",
-        "symfony/options-resolver": "^7.3"
+        "symfony/options-resolver": "^7.4"
     },
     "require-dev": {
         "ext-xdebug": "*",
-        "friendsofphp/php-cs-fixer": "^3.63",
+        "friendsofphp/php-cs-fixer": "^3.94",
         "phpstan/phpstan": "^1.12",
-        "phpunit/phpunit": "^11.4",
-        "opis/json-schema": "^2.4"
+        "phpunit/phpunit": "^11.5",
+        "opis/json-schema": "^2.6"
     },
     "scripts": {
         "docs": "php tools/phpdocumentor run --config=phpdoc.xml",
