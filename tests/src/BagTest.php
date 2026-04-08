@@ -138,6 +138,52 @@ class BagTest extends TestCase
     }
 
     /**
+     * Documents PHP ArrayAccess limitation: double-bracket syntax on nested
+     * keys does NOT persist changes. $container['a']['b'] = 'x' is silently
+     * lost because offsetGet() returns a value copy, not a reference. Same
+     * applies to unset($container['a']['b']).
+     *
+     * Use dot notation instead: $container['a.b'] = 'x'.
+     *
+     * @return void
+     */
+    public function testNestedBracketSyntaxDoesNotPersist(): void
+    {
+        $bag = new Bag(['search' => ['daysAgo' => 7]]);
+
+        // Looks valid but silently does nothing: PHP calls offsetGet('search'),
+        // gets a copy of the array, sets 'criteria' on it, then discards it.
+        // PHP itself emits a notice "Indirect modification of overloaded element
+        // has no effect" — suppressed here because it is the expected behavior
+        // being documented.
+        @($bag['search']['criteria'] = 'UNSEEN SINCE 2025-01-01');
+        $this->assertNull($bag->get('search.criteria'));
+
+        // Same for unset($bag['search']['daysAgo']): also a no-op that emits
+        // the same notice. PHP 8.5+ disallows @unset(), so the mechanism is
+        // shown explicitly — this is what PHP does internally either way.
+        $searchCopy = $bag['search'];    // offsetGet returns a value copy
+        unset($searchCopy['daysAgo']);   // unsets from the copy only
+        $this->assertSame(7, $bag->get('search.daysAgo'));
+    }
+
+    /**
+     * Tests that dot notation correctly persists nested key operations.
+     *
+     * @return void
+     */
+    public function testNestedDotNotationPersists(): void
+    {
+        $bag = new Bag(['search' => ['daysAgo' => 7]]);
+
+        $bag['search.criteria'] = 'UNSEEN SINCE 2025-01-01';
+        $this->assertSame('UNSEEN SINCE 2025-01-01', $bag->get('search.criteria'));
+
+        unset($bag['search.daysAgo']);
+        $this->assertNull($bag->get('search.daysAgo'));
+    }
+
+    /**
      * Tests method chaining returns correct instance.
      *
      * @return void
