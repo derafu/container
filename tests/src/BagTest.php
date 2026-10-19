@@ -156,6 +156,7 @@ class BagTest extends TestCase
         // PHP itself emits a notice "Indirect modification of overloaded element
         // has no effect" — suppressed here because it is the expected behavior
         // being documented.
+        $this->assertIsArray($bag['search']);
         @($bag['search']['criteria'] = 'UNSEEN SINCE 2025-01-01');
         $this->assertNull($bag->get('search.criteria'));
 

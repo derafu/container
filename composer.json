@@ -28,12 +28,12 @@
         "php": "^8.5",
         "doctrine/collections": "^2.6",
         "derafu/selector": "dev-main",
-        "symfony/options-resolver": "^8.0"
+        "symfony/options-resolver": "^8.1"
     },
     "require-dev": {
         "ext-xdebug": "*",
         "friendsofphp/php-cs-fixer": "^3.95",
-        "phpstan/phpstan": "^2.2",
+        "phpstan/phpstan": "^2.3",
         "phpunit/phpunit": "^13.4",
         "opis/json-schema": "^2.6"
     },

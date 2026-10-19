@@ -28,7 +28,7 @@ interface JournalInterface extends ContainerInterface
     /**
      * Returns elements in reverse order (newest to oldest).
      *
-     * @return array Elements in reverse order.
+     * @return array<array-key, mixed> Elements in reverse order.
      */
     public function reverse(): array;
 }

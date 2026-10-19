@@ -23,7 +23,7 @@ interface BagInterface extends ContainerInterface
     /**
      * Replaces all stored values with new ones.
      *
-     * @param array|ArrayAccess|ArrayObject $data New values to store.
+     * @param array<array-key, mixed>|ArrayAccess<*, *>|ArrayObject<*, *> $data New values to store.
      * @return static Allows method chaining.
      */
     public function replace(array|ArrayAccess|ArrayObject $data): static;
@@ -31,7 +31,7 @@ interface BagInterface extends ContainerInterface
     /**
      * Merges stored values with new values.
      *
-     * @param array|ArrayAccess|ArrayObject $data Values to merge with
+     * @param array<array-key, mixed>|ArrayAccess<*, *>|ArrayObject<*, *> $data Values to merge with
      * existing ones.
      * @return static Allows method chaining.
      */

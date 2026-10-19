@@ -12,10 +12,13 @@ declare(strict_types=1);
 
 namespace Derafu\TestsContainer;
 
+use ArrayObject;
 use Derafu\Container\Store;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 #[CoversClass(Store::class)]
 class StoreTest extends TestCase
@@ -23,7 +26,7 @@ class StoreTest extends TestCase
     /**
      * Provides test cases from fixtures for schema validation.
      *
-     * @return array<string, array{0: array, 1: array, 2: array|string}>
+     * @return array<string, array{array<array-key, mixed>, array<array-key, mixed>, array<string, mixed>|class-string<Throwable>}>
      */
     public static function provideTestCases(): array
     {
@@ -74,12 +77,40 @@ class StoreTest extends TestCase
         $this->assertSame($expected, $container->getSchema());
     }
 
+    public function testValidationReportsTheFieldAndPreservesInvalidData(): void
+    {
+        $container = new Store(['age' => 18], [
+            'properties' => ['age' => ['type' => 'integer']],
+        ]);
+        $container->set('age', 'invalid');
+
+        try {
+            $container->validate();
+            $this->fail('Validation must report the invalid value.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertStringContainsString('age', $exception->getMessage());
+            $this->assertStringContainsString('integer', $exception->getMessage());
+            $this->assertSame('invalid', $container->get('age'));
+        }
+    }
+
+    public function testSchemaValidationAcceptsDataFromAnArrayObject(): void
+    {
+        $container = new Store(new ArrayObject(['name' => 'John']), [
+            'properties' => ['name' => ['type' => 'string']],
+        ]);
+
+        $container->validate();
+
+        $this->assertSame(['name' => 'John'], $container->all());
+    }
+
     /**
      * Tests store with fixture data and schema.
      *
-     * @param array $data Input data.
-     * @param array $schema JSON schema.
-     * @param array|string $expected Expected values or exception class.
+     * @param array<array-key, mixed> $data Input data.
+     * @param array<array-key, mixed> $schema JSON schema.
+     * @param array<string, mixed>|class-string<Throwable> $expected Expected values or exception class.
      * @return void
      */
     #[DataProvider('provideTestCases')]
@@ -94,6 +125,7 @@ class StoreTest extends TestCase
 
         $container = new Store($data, $schema);
 
+        $this->assertIsArray($expected);
         foreach ($expected as $selector => $expectedValue) {
             $this->assertSame($expectedValue, $container->get($selector));
         }

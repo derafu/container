@@ -19,7 +19,7 @@ return [
             'foo' => 'bar',
         ],
         'schema' => [
-            // Vacío a propósito para corroborar que funcione sin esquema.
+            // Intentionally empty to verify operation without a schema.
         ],
         'expected' => [
             'foo' => 'bar',
@@ -46,7 +46,7 @@ return [
     ],
     'basic_schema_validation_fail' => [
         'data' => [
-            // Vacío a propósito para que falle.
+            // Intentionally empty to trigger validation failure.
         ],
         'schema' => [
             'email' => [
@@ -91,7 +91,7 @@ return [
         'schema' => [
             'price' => [
                 'types' => ['float', 'string'],
-                'normalizer' => 'float', // En realidad debería ser un closure.
+                'normalizer' => 'float', // A valid normalizer must be a closure.
             ],
         ],
         'expected' => [
@@ -105,7 +105,7 @@ return [
         'schema' => [
             'price' => [
                 'types' => 'float',
-                'normalizer' => 'float', // En realidad debería ser un closure.
+                'normalizer' => 'float', // A valid normalizer must be a closure.
             ],
         ],
         'expected' => InvalidOptionsException::class,

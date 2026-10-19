@@ -22,7 +22,7 @@ interface StoreInterface extends ContainerInterface
     /**
      * Sets the schema used to validate data.
      *
-     * @param array $schema New schema to use.
+     * @param array<array-key, mixed> $schema New schema to use.
      * @return static Allows method chaining.
      */
     public function setSchema(array $schema): static;
@@ -30,7 +30,7 @@ interface StoreInterface extends ContainerInterface
     /**
      * Returns the defined data schema.
      *
-     * @return array Current schema.
+     * @return array<array-key, mixed> Current schema.
      */
     public function getSchema(): array;
 

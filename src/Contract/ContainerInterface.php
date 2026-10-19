@@ -19,20 +19,22 @@ use JsonSerializable;
 
 /**
  * Base interface for all storage implementations.
+ *
+ * @extends ArrayAccess<mixed, mixed>
  */
 interface ContainerInterface extends ArrayAccess, JsonSerializable
 {
     /**
      * Returns the collection of stored data.
      *
-     * @return ArrayCollection Collection of all stored values.
+     * @return ArrayCollection<array-key, mixed> Collection of all stored values.
      */
     public function collection(): ArrayCollection;
 
     /**
      * Returns all stored values.
      *
-     * @return array Array of all stored values.
+     * @return array<array-key, mixed> Array of all stored values.
      */
     public function all(): array;
 
@@ -80,7 +82,7 @@ interface ContainerInterface extends ArrayAccess, JsonSerializable
      *
      * @param Criteria $criteria The Criteria defining conditions, order and
      * limits for the results.
-     * @return ArrayCollection New collection with elements matching the
+     * @return ArrayCollection<array-key, mixed> New collection with elements matching the
      * criteria.
      * @see \Doctrine\Common\Collections\Criteria
      * @see \Doctrine\Common\Collections\ArrayCollection

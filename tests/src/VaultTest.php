@@ -22,6 +22,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\Options;
+use Throwable;
 use Traversable;
 
 #[CoversClass(Vault::class)]
@@ -30,7 +31,7 @@ class VaultTest extends TestCase
     /**
      * Provides test cases from fixtures for schema validation.
      *
-     * @return array<string, array{0: array, 1: array, 2: array|string}>
+     * @return array<string, array{array<array-key, mixed>, array<array-key, mixed>, array<string, mixed>|class-string<Throwable>}>
      */
     public static function provideTestCases(): array
     {
@@ -70,9 +71,9 @@ class VaultTest extends TestCase
     /**
      * Tests vault with fixture data and schema.
      *
-     * @param array $data Input data.
-     * @param array $schema Schema configuration.
-     * @param array|string $expected Expected values or exception class.
+     * @param array<array-key, mixed> $data Input data.
+     * @param array<array-key, mixed> $schema Schema configuration.
+     * @param array<string, mixed>|class-string<Throwable> $expected Expected values or exception class.
      * @return void
      */
     #[DataProvider('provideTestCases')]
@@ -89,6 +90,7 @@ class VaultTest extends TestCase
 
         $container = new Vault($data, $schema);
 
+        $this->assertIsArray($expected);
         foreach ($expected as $selector => $expectedValue) {
             $this->assertSame($expectedValue, $container->get($selector));
         }
@@ -97,18 +99,21 @@ class VaultTest extends TestCase
     /**
      * Resolves normalizer strings to closures in schema.
      *
-     * @param array<string, mixed> $schema Schema by reference.
+     * @param array<array-key, mixed> $schema Schema by reference.
      * @return void
      */
     private function resolveNormalizers(&$schema): void
     {
         foreach ($schema as $key => &$rules) {
+            $this->assertIsArray($rules);
             if (!empty($rules['normalizer'])) {
+                $this->assertIsString($rules['normalizer']);
                 $rules['normalizer'] = $this->resolveNormalizer(
                     $rules['normalizer']
                 );
             }
             if (!empty($rules['schema'])) {
+                $this->assertIsArray($rules['schema']);
                 $this->resolveNormalizers($rules['schema']);
             }
         }
@@ -184,31 +189,40 @@ class VaultTest extends TestCase
 
 /**
  * Test double implementing ArrayAccess and IteratorAggregate.
+ *
+ * @implements ArrayAccess<array-key, mixed>
+ * @implements IteratorAggregate<array-key, mixed>
  */
 class MyArrayAccess implements ArrayAccess, IteratorAggregate
 {
+    /** @var array<array-key, mixed> */
     private array $container = ['key1' => 'value1', 'key2' => 'value2'];
 
+    /** @param int|string $offset */
     public function offsetExists($offset): bool
     {
         return isset($this->container[$offset]);
     }
 
+    /** @param int|string $offset */
     public function offsetGet($offset): mixed
     {
         return $this->container[$offset] ?? null;
     }
 
+    /** @param int|string $offset */
     public function offsetSet($offset, $value): void
     {
         $this->container[$offset] = $value;
     }
 
+    /** @param int|string $offset */
     public function offsetUnset($offset): void
     {
         unset($this->container[$offset]);
     }
 
+    /** @return Traversable<array-key, mixed> */
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this->container);

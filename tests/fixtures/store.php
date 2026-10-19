@@ -47,7 +47,7 @@ return [
     ],
     'basic_schema_validation_fail' => [
         'data' => [
-            // Vacío a propósito para que falle
+            // Intentionally empty to trigger validation failure.
         ],
         'schema' => [
             'type' => 'object',

@@ -2,7 +2,7 @@
 <phpunit
     backupGlobals="true"
     cacheDirectory="var/cache/phpunit"
-    processIsolation="true"
+    processIsolation="false"
     executionOrder="defects"
     resolveDependencies="true"
     colors="true"
@@ -35,7 +35,7 @@
     </testsuites>
     <coverage
         ignoreDeprecatedCodeUnits="true"
-        pathCoverage="true"
+        pathCoverage="false"
     >
         <report>
             <text

@@ -16,6 +16,7 @@ use ArrayAccess;
 use ArrayObject;
 use Derafu\Container\Abstract\AbstractContainer;
 use Derafu\Container\Contract\VaultInterface;
+use Derafu\Translation\Exception\Logic\TranslatableInvalidArgumentException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -27,15 +28,15 @@ class Vault extends AbstractContainer implements VaultInterface
     /**
      * Data schema configuration.
      *
-     * @var array
+     * @var array<array-key, mixed>
      */
     protected array $schema = [];
 
     /**
      * Constructor.
      *
-     * @param array|ArrayAccess|ArrayObject $data Initial data.
-     * @param array $schema Initial schema.
+     * @param array<array-key, mixed>|ArrayAccess<*, *>|ArrayObject<*, *> $data Initial data.
+     * @param array<array-key, mixed> $schema Initial schema.
      * @param bool $allowUndefinedKeys Whether to allow undefined keys.
      */
     public function __construct(
@@ -80,34 +81,68 @@ class Vault extends AbstractContainer implements VaultInterface
     /**
      * Validates and resolves data using a schema.
      *
-     * @param array $data Data to validate.
-     * @param array $schema Schema to use.
+     * @param array<array-key, mixed> $data Data to validate.
+     * @param array<array-key, mixed> $schema Schema to use.
      * @param bool $allowUndefinedKeys Whether to allow undefined keys.
-     * @return array Validated and normalized data.
+     * @return array<array-key, mixed> Validated and normalized data.
      */
     private function resolve(
         array $data,
         array $schema,
         bool $allowUndefinedKeys = false
     ): array {
-        // Si no hay esquema los datos son válidos como vienen.
+        // Without a schema, accept the data as provided.
         if (empty($schema)) {
             return $data;
         }
 
-        // Determinar si se permitirán opciones no definidas en el esquema.
+        // Determine whether options not defined in the schema are allowed.
         $allowUndefinedKeys = $schema['__allowUndefinedKeys']
             ?? $allowUndefinedKeys
         ;
+        if (!is_bool($allowUndefinedKeys)) {
+            throw new TranslatableInvalidArgumentException([
+                'The __allowUndefinedKeys setting must be a bool; {type} given.',
+                'type' => get_debug_type($allowUndefinedKeys),
+            ]);
+        }
         unset($schema['__allowUndefinedKeys']);
 
-        // Crear resolver y configurar.
+        // Create and configure the resolver.
         $resolver = new OptionsResolver();
         foreach ($schema as $key => $config) {
-            // Configurar el nivel actual.
+            if (!is_array($config)) {
+                throw new TranslatableInvalidArgumentException([
+                    'The configuration of field {field} must be an array; {type} given.',
+                    'field' => $key,
+                    'type' => get_debug_type($config),
+                ]);
+            }
+
+            // Configure the current level.
             if (!empty($config['types'])) {
+                $types = $config['types'];
+                if (is_array($types)) {
+                    foreach ($types as $index => $type) {
+                        if (!is_string($type)) {
+                            throw new TranslatableInvalidArgumentException([
+                                'The types entry {index} of field {field} must be a string; {type} given.',
+                                'index' => $index,
+                                'field' => $key,
+                                'type' => get_debug_type($type),
+                            ]);
+                        }
+                    }
+                } elseif (!is_string($types)) {
+                    throw new TranslatableInvalidArgumentException([
+                        'The types of field {field} must be a string or an array of strings; {type} given.',
+                        'field' => $key,
+                        'type' => get_debug_type($types),
+                    ]);
+                }
+
                 $resolver->setDefined([$key]);
-                $resolver->setAllowedTypes($key, $config['types']);
+                $resolver->setAllowedTypes($key, $types);
             }
 
             if (!empty($config['required'])) {
@@ -122,7 +157,7 @@ class Vault extends AbstractContainer implements VaultInterface
                 $resolver->setDefault($key, $config['default']);
             }
 
-            // Si hay un schema anidado, configurar el normalizador.
+            // Configure the normalizer for a nested schema.
             if (!empty($config['schema'])) {
                 $resolver->setDefault($key, []);
                 $resolver->setAllowedTypes($key, 'array');
@@ -141,12 +176,12 @@ class Vault extends AbstractContainer implements VaultInterface
             }
         }
 
-        // Permitir opciones adicionales no definidas.
+        // Allow additional undefined options.
         if ($allowUndefinedKeys) {
             $resolver->setDefined(array_keys($data));
         }
 
-        // Resolver las opciones.
+        // Resolve the options.
         return $resolver->resolve($data);
     }
 }

@@ -16,9 +16,11 @@ use ArrayAccess;
 use ArrayObject;
 use Derafu\Container\Contract\ContainerInterface;
 use Derafu\Selector\Selector;
+use Derafu\Translation\Exception\Logic\TranslatableInvalidArgumentException;
+use Derafu\Translation\Exception\Logic\TranslatableInvalidArgumentException as InvalidArgumentException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
-use InvalidArgumentException;
+use Stringable;
 use Traversable;
 
 /**
@@ -29,7 +31,7 @@ abstract class AbstractContainer implements ContainerInterface
     /**
      * Stored data collection.
      *
-     * @var ArrayCollection
+     * @var ArrayCollection<array-key, mixed>
      */
     protected ArrayCollection $data;
 
@@ -104,7 +106,7 @@ abstract class AbstractContainer implements ContainerInterface
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        $this->set((string) $offset, $value);
+        $this->set($this->normalizeOffset($offset), $value);
     }
 
     /**
@@ -112,7 +114,7 @@ abstract class AbstractContainer implements ContainerInterface
      */
     public function offsetGet(mixed $offset): mixed
     {
-        return $this->get((string) $offset);
+        return $this->get($this->normalizeOffset($offset));
     }
 
     /**
@@ -120,7 +122,7 @@ abstract class AbstractContainer implements ContainerInterface
      */
     public function offsetExists(mixed $offset): bool
     {
-        return $this->has((string) $offset);
+        return $this->has($this->normalizeOffset($offset));
     }
 
     /**
@@ -128,14 +130,31 @@ abstract class AbstractContainer implements ContainerInterface
      */
     public function offsetUnset(mixed $offset): void
     {
-        $this->clear((string) $offset);
+        $this->clear($this->normalizeOffset($offset));
+    }
+
+    /**
+     * Converts an ArrayAccess offset to a selector path.
+     *
+     * @throws TranslatableInvalidArgumentException If the offset cannot be converted.
+     */
+    private function normalizeOffset(mixed $offset): string
+    {
+        if ($offset === null || is_scalar($offset) || $offset instanceof Stringable) {
+            return (string) $offset;
+        }
+
+        throw new TranslatableInvalidArgumentException([
+            'The container offset must be a bool, int, float, string, Stringable, or null; {type} given.',
+            'type' => get_debug_type($offset),
+        ]);
     }
 
     /**
      * Creates a new ArrayCollection for use or assignment to $data.
      *
-     * @param array|ArrayAccess|ArrayObject $data Source data.
-     * @return ArrayCollection New collection instance.
+     * @param array<array-key, mixed>|ArrayAccess<*, *>|ArrayObject<*, *> $data Source data.
+     * @return ArrayCollection<array-key, mixed> New collection instance.
      */
     protected function createFrom(
         array|ArrayAccess|ArrayObject $data
@@ -147,7 +166,7 @@ abstract class AbstractContainer implements ContainerInterface
                 $data = iterator_to_array($data);
             } else {
                 throw new InvalidArgumentException(
-                    'ArrayAccess debe implementar Traversable para ser convertible.'
+                    'ArrayAccess must implement Traversable to be convertible.'
                 );
             }
         }
@@ -158,7 +177,7 @@ abstract class AbstractContainer implements ContainerInterface
     /**
      * Returns the elements of $data as an array.
      *
-     * @return array Data as array.
+     * @return array<array-key, mixed> Data as array.
      */
     protected function toArray(): array
     {
@@ -167,6 +186,8 @@ abstract class AbstractContainer implements ContainerInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @return array<array-key, mixed>
      */
     public function jsonSerialize(): array
     {

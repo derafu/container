@@ -25,7 +25,7 @@ class Bag extends AbstractContainer implements BagInterface
     /**
      * Constructor.
      *
-     * @param array|ArrayAccess|ArrayObject $data Initial data.
+     * @param array<array-key, mixed>|ArrayAccess<*, *>|ArrayObject<*, *> $data Initial data.
      */
     public function __construct(array|ArrayAccess|ArrayObject $data = [])
     {

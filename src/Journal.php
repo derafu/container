@@ -25,7 +25,7 @@ class Journal extends AbstractContainer implements JournalInterface
     /**
      * Constructor.
      *
-     * @param array|ArrayAccess|ArrayObject $data Initial journal data.
+     * @param array<array-key, mixed>|ArrayAccess<*, *>|ArrayObject<*, *> $data Initial journal data.
      */
     public function __construct(array|ArrayAccess|ArrayObject $data = [])
     {
