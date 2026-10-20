@@ -76,22 +76,21 @@ final class StoreValidationTest extends TestCase
         }
     }
 
-    public function testValidationRejectsResourcesWithoutChangingOrClosingThem(): void
+    public function testSetRejectsResourcesWithoutChangingOrClosingThem(): void
     {
         $resource = fopen('php://memory', 'r+');
         $this->assertIsResource($resource);
         $store = new Store(['value' => 'valid'], ['properties' => ['value' => true]]);
-        $store->set('value', $resource);
 
         try {
             try {
-                $store->validate();
+                $store->set('value', $resource);
                 $this->fail('A resource cannot be encoded as JSON.');
             } catch (TranslatableInvalidArgumentException $exception) {
                 $cause = $exception->getPrevious();
                 $this->assertInstanceOf(JsonException::class, $cause);
                 $this->assertSame(JSON_ERROR_UNSUPPORTED_TYPE, $cause->getCode());
-                $this->assertSame($resource, $store->get('value'));
+                $this->assertSame('valid', $store->get('value'));
                 $this->assertSame(10, fwrite($resource, 'still open'));
             }
         } finally {
@@ -124,16 +123,15 @@ final class StoreValidationTest extends TestCase
                 ],
             ],
         ]);
-        $store->set('user', 'invalid scalar');
 
         try {
-            $store->validate();
+            $store->set('user', 'invalid scalar');
             $this->fail('A scalar must not satisfy an object schema.');
         } catch (TranslatableInvalidArgumentException $exception) {
             $this->assertStringContainsString('object', $exception->getMessage());
             $this->assertStringContainsString('/user', $exception->getMessage());
             $this->assertNull($exception->getPrevious());
-            $this->assertSame(['user' => 'invalid scalar'], $store->all());
+            $this->assertSame(['user' => ['name' => 'Ada']], $store->all());
         }
     }
 
@@ -142,18 +140,16 @@ final class StoreValidationTest extends TestCase
         $store = new Store(['value' => ['anything']], ['properties' => ['value' => true]]);
         $store->validate();
         $this->assertSame(['value' => ['anything']], $store->all());
-        $store->setSchema(['properties' => ['value' => false]]);
         $this->expectException(TranslatableInvalidArgumentException::class);
-        $store->validate();
+        $store->setSchema(['properties' => ['value' => false]]);
     }
 
     public function testValidationErrorsTranslateTheirWrapperAndSection(): void
     {
         $store = new Store(['age' => 18], ['properties' => ['age' => ['type' => 'integer']]]);
-        $store->set('age', 'invalid');
 
         try {
-            $store->validate();
+            $store->set('age', 'invalid');
             $this->fail('An invalid field must be reported.');
         } catch (TranslatableInvalidArgumentException $exception) {
             $this->assertStringStartsWith('Failed to validate the data against the JSON schema. ', $exception->getMessage());
@@ -163,7 +159,7 @@ final class StoreValidationTest extends TestCase
             $this->assertStringStartsWith('No se pudieron validar los datos contra el esquema JSON. ', $translated);
             $this->assertStringContainsString(' en /age.', $translated);
             $this->assertStringContainsString('integer', $translated);
-            $this->assertSame(['age' => 'invalid'], $store->all());
+            $this->assertSame(['age' => 18], $store->all());
         }
     }
 

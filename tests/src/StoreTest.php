@@ -72,25 +72,24 @@ class StoreTest extends TestCase
             ],
         ];
 
-        $container = new Store();
+        $container = new Store(['foo' => 'bar']);
         $container->setSchema($schema);
         $this->assertSame($expected, $container->getSchema());
     }
 
-    public function testValidationReportsTheFieldAndPreservesInvalidData(): void
+    public function testSetReportsTheFieldAndKeepsTheStoredData(): void
     {
         $container = new Store(['age' => 18], [
             'properties' => ['age' => ['type' => 'integer']],
         ]);
-        $container->set('age', 'invalid');
 
         try {
-            $container->validate();
-            $this->fail('Validation must report the invalid value.');
+            $container->set('age', 'invalid');
+            $this->fail('Setting an invalid value must be reported.');
         } catch (InvalidArgumentException $exception) {
             $this->assertStringContainsString('age', $exception->getMessage());
             $this->assertStringContainsString('integer', $exception->getMessage());
-            $this->assertSame('invalid', $container->get('age'));
+            $this->assertSame(18, $container->get('age'));
         }
     }
 

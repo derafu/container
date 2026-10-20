@@ -33,6 +33,12 @@ class Vault extends AbstractContainer implements VaultInterface
     protected array $schema = [];
 
     /**
+     * Whether the keys not defined in the schema are allowed, unless the
+     * schema says otherwise.
+     */
+    protected bool $allowUndefinedKeys = false;
+
+    /**
      * Constructor.
      *
      * @param array<array-key, mixed>|ArrayAccess<*, *>|ArrayObject<*, *> $data Initial data.
@@ -44,11 +50,12 @@ class Vault extends AbstractContainer implements VaultInterface
         array $schema = [],
         bool $allowUndefinedKeys = false
     ) {
+        $this->allowUndefinedKeys = $allowUndefinedKeys;
         $this->setSchema($schema);
         if (!is_array($data)) {
             $data = $this->createFrom($data)->toArray();
         }
-        $data = $this->resolve($data, $this->schema, $allowUndefinedKeys);
+        $data = $this->resolve($data, $this->schema, $this->allowUndefinedKeys);
         $this->data = $this->createFrom($data);
     }
 
@@ -57,6 +64,13 @@ class Vault extends AbstractContainer implements VaultInterface
      */
     public function setSchema(array $schema): static
     {
+        // The stored data must comply with the new schema. The container is
+        // not changed if it does not.
+        if (isset($this->data)) {
+            $this->data = $this->createFrom(
+                $this->resolve($this->toArray(), $schema, $this->allowUndefinedKeys)
+            );
+        }
         $this->schema = $schema;
 
         return $this;
@@ -73,9 +87,21 @@ class Vault extends AbstractContainer implements VaultInterface
     /**
      * {@inheritDoc}
      */
-    public function validate(bool $allowUndefinedKeys = false): void
+    public function validate(?bool $allowUndefinedKeys = null): void
     {
-        $this->resolve($this->toArray(), $this->schema, $allowUndefinedKeys);
+        $this->resolve(
+            $this->toArray(),
+            $this->schema,
+            $allowUndefinedKeys ?? $this->allowUndefinedKeys
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function prepare(array $data): array
+    {
+        return $this->resolve($data, $this->schema, $this->allowUndefinedKeys);
     }
 
     /**

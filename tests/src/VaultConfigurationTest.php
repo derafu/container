@@ -84,20 +84,19 @@ final class VaultConfigurationTest extends TestCase
 
     /** @param array<array-key, mixed> $schema */
     #[DataProvider('invalidConfigurations')]
-    public function testValidationRejectsInvalidConfigurationWithoutChangingData(array $schema, string $message, string $translation): void
+    public function testSetSchemaRejectsInvalidConfigurationWithoutChangingData(array $schema, string $message, string $translation): void
     {
         $vault = new Vault(['value' => 'unchanged']);
         $collection = $vault->collection();
-        $vault->setSchema($schema);
 
         $this->assertConfigurationError(
-            static fn () => $vault->validate(),
+            static fn () => $vault->setSchema($schema),
             $message,
             $translation
         );
         $this->assertSame(['value' => 'unchanged'], $vault->all());
         $this->assertSame($collection, $vault->collection());
-        $this->assertSame($schema, $vault->getSchema());
+        $this->assertSame([], $vault->getSchema());
     }
 
     public function testResourcesAreRejectedWithoutBeingClosed(): void
@@ -162,14 +161,15 @@ final class VaultConfigurationTest extends TestCase
         $vault->validate();
         $this->assertSame($data, $vault->all());
 
+        $original = $schema;
         $schema['user']['schema']['__allowUndefinedKeys'] = false;
-        $vault->setSchema($schema);
         try {
-            $vault->validate();
+            $vault->setSchema($schema);
             $this->fail('The nested policy must reject undefined keys.');
         } catch (UndefinedOptionsException $exception) {
             $this->assertStringContainsString('extra', $exception->getMessage());
             $this->assertSame($data, $vault->all());
+            $this->assertSame($original, $vault->getSchema());
         }
     }
 
@@ -230,9 +230,8 @@ final class VaultConfigurationTest extends TestCase
         ]);
         $vault->validate();
         $this->assertSame(['note' => null, 'price' => 12.5, 'status' => 'active'], $vault->all());
-        $vault->set('status', 'invalid');
         $this->expectException(InvalidOptionsException::class);
-        $vault->validate();
+        $vault->set('status', 'invalid');
     }
 
     /** @param Closure(): mixed $operation */

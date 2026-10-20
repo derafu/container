@@ -77,6 +77,14 @@ class Store extends AbstractContainer implements StoreInterface
         if (!$resolved instanceof stdClass) {
             throw new InvalidArgumentException('The container schema must resolve to an object.');
         }
+
+        // The stored data must comply with the new schema. The container is
+        // not changed if it does not.
+        if (isset($this->data)) {
+            $this->data = $this->createFrom(
+                $this->resolve($this->toArray(), $resolved)
+            );
+        }
         $this->schema = $resolved;
 
         return $this;
@@ -117,6 +125,14 @@ class Store extends AbstractContainer implements StoreInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    protected function prepare(array $data): array
+    {
+        return $this->resolve($data, $this->schema);
+    }
+
+    /**
      * Validates and resolves data using a JSON schema.
      *
      * @param array<array-key, mixed> $data Data to validate.
@@ -131,7 +147,9 @@ class Store extends AbstractContainer implements StoreInterface
 
         $data = $this->applyDefaults($data, $schema);
         try {
-            $json = json_decode(
+            // The data is an object in the schema, also when it is empty (an
+            // empty PHP array would be encoded as a JSON array).
+            $json = $data === [] ? new stdClass() : json_decode(
                 json_encode($data, JSON_THROW_ON_ERROR),
                 false,
                 512,

@@ -63,7 +63,7 @@ class VaultTest extends TestCase
             ],
         ];
 
-        $container = new Vault();
+        $container = new Vault(['foo' => 'bar']);
         $container->setSchema($schema);
         $this->assertSame($schema, $container->getSchema());
     }

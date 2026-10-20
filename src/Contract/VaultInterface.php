@@ -37,9 +37,10 @@ interface VaultInterface extends ContainerInterface
     /**
      * Validates that stored data complies with the schema.
      *
-     * @param bool $allowUndefinedKeys Whether to allow undefined keys.
+     * @param bool|null $allowUndefinedKeys Whether to allow undefined keys, or
+     * `null` to use the policy the container was created with.
      * @return void
      * @throws Exception Thrown when validation fails.
      */
-    public function validate(bool $allowUndefinedKeys = false): void;
+    public function validate(?bool $allowUndefinedKeys = null): void;
 }
