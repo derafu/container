@@ -17,6 +17,7 @@ use Derafu\Container\Abstract\AbstractContainer;
 use Derafu\Container\Bag;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Order;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -36,7 +37,7 @@ final class ContainerCollectionTest extends TestCase
         $bag = new Bag($rows);
         $criteria = Criteria::create()
             ->where(Criteria::expr()->eq('active', true))
-            ->orderBy(['score' => 'DESC'])
+            ->orderBy(['score' => Order::Descending])
             ->setFirstResult(1)
             ->setMaxResults(1)
         ;
