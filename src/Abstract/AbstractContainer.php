@@ -14,13 +14,15 @@ namespace Derafu\Container\Abstract;
 
 use ArrayAccess;
 use ArrayObject;
-use BackedEnum;
+use Derafu\Array\ArrayReader;
 use Derafu\Container\Contract\ContainerInterface;
 use Derafu\Container\Exception\MissingValueException;
 use Derafu\Container\Exception\UnexpectedTypeException;
 use Derafu\Selector\Selector;
 use Derafu\Translation\Exception\Logic\TranslatableInvalidArgumentException;
 use Derafu\Translation\Exception\Logic\TranslatableInvalidArgumentException as InvalidArgumentException;
+use Derafu\Value\Exception\TypeMismatchException as ValueTypeMismatchException;
+use Derafu\Value\ValueType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Stringable;
@@ -52,6 +54,14 @@ abstract class AbstractContainer implements ContainerInterface
     public function all(): array
     {
         return $this->toArray();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getReader(): ArrayReader
+    {
+        return ArrayReader::fromArray($this->toArray());
     }
 
     /**
@@ -107,227 +117,21 @@ abstract class AbstractContainer implements ContainerInterface
     /**
      * {@inheritDoc}
      */
-    public function getString(string $key, ?string $default = null): ?string
-    {
-        $value = $this->raw($key);
-        if ($value === null) {
-            return $default;
-        }
-        if (!is_string($value)) {
-            throw $this->unexpectedType($key, 'string', $value);
-        }
-
-        return $value;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function requireString(string $key): string
-    {
-        return $this->getString($key) ?? throw $this->missingValue($key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getInt(string $key, ?int $default = null): ?int
-    {
-        $value = $this->raw($key);
-        if ($value === null) {
-            return $default;
-        }
-        if (!is_int($value)) {
-            throw $this->unexpectedType($key, 'int', $value);
-        }
-
-        return $value;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function requireInt(string $key): int
-    {
-        return $this->getInt($key) ?? throw $this->missingValue($key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getFloat(string $key, ?float $default = null): ?float
-    {
-        $value = $this->raw($key);
-        if ($value === null) {
-            return $default;
-        }
-        if (is_float($value)) {
-            return $value;
-        }
-        if (is_int($value)) {
-            return (float) $value;
-        }
-
-        throw $this->unexpectedType($key, 'float', $value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function requireFloat(string $key): float
-    {
-        return $this->getFloat($key) ?? throw $this->missingValue($key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getBool(string $key, ?bool $default = null): ?bool
-    {
-        $value = $this->raw($key);
-        if ($value === null) {
-            return $default;
-        }
-        if (!is_bool($value)) {
-            throw $this->unexpectedType($key, 'bool', $value);
-        }
-
-        return $value;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function requireBool(string $key): bool
-    {
-        return $this->getBool($key) ?? throw $this->missingValue($key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getArray(
-        string $key,
-        ?array $default = null,
-        string $of = 'mixed'
-    ): ?array {
-        $value = $this->raw($key);
-        if ($value === null) {
-            return $default;
-        }
-        if (!is_array($value)) {
-            throw $this->unexpectedType($key, 'array', $value);
-        }
-
-        return $this->checkElements($key, $value, $of);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function requireArray(string $key, string $of = 'mixed'): array
-    {
-        return $this->getArray($key, null, $of) ?? throw $this->missingValue($key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getList(
-        string $key,
-        ?array $default = null,
-        string $of = 'mixed'
-    ): ?array {
-        $value = $this->raw($key);
-        if ($value === null) {
-            return $default;
-        }
-        if (!is_array($value) || !array_is_list($value)) {
-            throw $this->unexpectedType($key, 'list', $value);
-        }
-
-        return array_values($this->checkElements($key, $value, $of));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function requireList(string $key, string $of = 'mixed'): array
-    {
-        return $this->getList($key, null, $of) ?? throw $this->missingValue($key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getEnum(
-        string $key,
-        string $class,
-        ?BackedEnum $default = null
-    ): ?BackedEnum {
-        $value = $this->raw($key);
-        if ($value === null) {
-            return $default;
-        }
-        if ($value instanceof $class) {
-            return $value;
-        }
-        if (is_int($value) || is_string($value)) {
-            $case = $class::tryFrom($value);
-            if ($case !== null) {
-                return $case;
-            }
-        }
-
-        throw $this->unexpectedType($key, $class, $value);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function requireEnum(string $key, string $class): BackedEnum
-    {
-        return $this->getEnum($key, $class) ?? throw $this->missingValue($key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getObject(
-        string $key,
-        string $class,
-        ?object $default = null
-    ): ?object {
-        $value = $this->raw($key);
-        if ($value === null) {
-            return $default;
-        }
-        if (!$value instanceof $class) {
-            throw $this->unexpectedType($key, $class, $value);
-        }
-
-        return $value;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function requireObject(string $key, string $class): object
-    {
-        return $this->getObject($key, $class) ?? throw $this->missingValue($key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getContainer(string $key, ?array $default = null): ?static
     {
-        $value = $this->raw($key);
+        $value = Selector::get($this->toArray(), $key);
         if ($value === null) {
             return $default === null ? null : $this->createChild($default, $key);
         }
-        if (!is_array($value)) {
-            throw $this->unexpectedType($key, 'array', $value);
+        try {
+            $value = ValueType::array()->parse($value, $key);
+        } catch (ValueTypeMismatchException $exception) {
+            throw new UnexpectedTypeException([
+                'The value of {key} must be of type {expected}; {type} given.',
+                'key' => $key,
+                'expected' => 'array',
+                'type' => get_debug_type($value),
+            ], previous: $exception);
         }
 
         return $this->createChild($value, $key);
@@ -403,80 +207,6 @@ abstract class AbstractContainer implements ContainerInterface
     protected function createChild(array $data, string $key): static
     {
         return new (static::class)($data);
-    }
-
-    /**
-     * Returns the value stored under a key exactly as it is stored.
-     *
-     * Unlike `get()`, it is not affected by the containers that override
-     * `get()` to transform the value.
-     */
-    private function raw(string $key): mixed
-    {
-        return Selector::get($this->toArray(), $key);
-    }
-
-    /**
-     * Checks the elements of an array against a type.
-     *
-     * @param string $key Key of the array, for the error messages.
-     * @param array<array-key, mixed> $items Elements to check.
-     * @param string $of `mixed`, `string`, `int`, `float`, `bool`, `array` or
-     * the name of a class or interface.
-     * @return array<array-key, mixed> Elements, with ints converted to float
-     * when `$of` is `float`.
-     */
-    private function checkElements(string $key, array $items, string $of): array
-    {
-        if ($of === 'mixed') {
-            return $items;
-        }
-
-        $isClass = !in_array($of, ['string', 'int', 'float', 'bool', 'array'], true);
-        if ($isClass && !class_exists($of) && !interface_exists($of)) {
-            throw new InvalidArgumentException([
-                'The element type {type} is not a scalar type, array, class or interface.',
-                'type' => $of,
-            ]);
-        }
-
-        $checked = [];
-        foreach ($items as $index => $item) {
-            if ($of === 'float' && is_int($item)) {
-                $checked[$index] = (float) $item;
-                continue;
-            }
-            $valid = match ($of) {
-                'string' => is_string($item),
-                'int' => is_int($item),
-                'float' => is_float($item),
-                'bool' => is_bool($item),
-                'array' => is_array($item),
-                default => $item instanceof $of,
-            };
-            if (!$valid) {
-                throw $this->unexpectedType($key . '.' . $index, $of, $item);
-            }
-            $checked[$index] = $item;
-        }
-
-        return $checked;
-    }
-
-    /**
-     * Creates the exception for a value that has another type.
-     */
-    private function unexpectedType(
-        string $key,
-        string $expected,
-        mixed $value
-    ): UnexpectedTypeException {
-        return new UnexpectedTypeException([
-            'The value of {key} must be of type {expected}; {type} given.',
-            'key' => $key,
-            'expected' => $expected,
-            'type' => get_debug_type($value),
-        ]);
     }
 
     /**

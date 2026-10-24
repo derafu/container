@@ -17,5 +17,4 @@ return [
     'The types of field {field} must be a string or an array of strings; {type} given.' => 'Los tipos del campo {field} deben ser un string o un arreglo de strings; se recibió {type}.',
     'The value of {key} must be of type {expected}; {type} given.' => 'El valor de {key} debe ser de tipo {expected}; se recibió {type}.',
     'The value of {key} is required but it is not defined.' => 'El valor de {key} es obligatorio pero no está definido.',
-    'The element type {type} is not a scalar type, array, class or interface.' => 'El tipo de elemento {type} no es un tipo escalar, array, clase ni interfaz.',
 ];

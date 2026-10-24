@@ -79,8 +79,8 @@ final class ContainerMutationValidationTest extends TestCase
 
         $vault->set('host', 'B.EXAMPLE.COM');
 
-        $this->assertSame('b.example.com', $vault->getString('host'));
-        $this->assertSame(993, $vault->getInt('port'));
+        $this->assertSame('b.example.com', $vault->getReader()->getString('host'));
+        $this->assertSame(993, $vault->getReader()->getInt('port'));
     }
 
     public function testVaultSetAcceptsUndefinedKeysWhenThePolicyAllowsIt(): void
@@ -89,7 +89,7 @@ final class ContainerMutationValidationTest extends TestCase
 
         $vault->set('extra', 1);
 
-        $this->assertSame(1, $vault->getInt('extra'));
+        $this->assertSame(1, $vault->getReader()->getInt('extra'));
     }
 
     public function testVaultClearRejectsRemovingARequiredKeyAndKeepsTheStoredData(): void
@@ -100,8 +100,8 @@ final class ContainerMutationValidationTest extends TestCase
             $vault->clear('host');
             $this->fail('Removing a required key must be rejected.');
         } catch (MissingOptionsException) {
-            $this->assertSame('a.example.com', $vault->getString('host'));
-            $this->assertSame(25, $vault->getInt('port'));
+            $this->assertSame('a.example.com', $vault->getReader()->getString('host'));
+            $this->assertSame(25, $vault->getReader()->getInt('port'));
         }
     }
 
@@ -111,7 +111,7 @@ final class ContainerMutationValidationTest extends TestCase
 
         $vault->clear('port');
 
-        $this->assertSame(993, $vault->getInt('port'));
+        $this->assertSame(993, $vault->getReader()->getInt('port'));
     }
 
     public function testVaultClearAllIsValidatedLikeAnyOtherChange(): void
@@ -137,8 +137,8 @@ final class ContainerMutationValidationTest extends TestCase
 
         $vault->setSchema(self::schema());
 
-        $this->assertSame('a.example.com', $vault->getString('host'));
-        $this->assertSame(993, $vault->getInt('port'));
+        $this->assertSame('a.example.com', $vault->getReader()->getString('host'));
+        $this->assertSame(993, $vault->getReader()->getInt('port'));
     }
 
     public function testVaultSetSchemaRejectsDataThatDoesNotComplyAndKeepsTheSchema(): void
@@ -150,8 +150,8 @@ final class ContainerMutationValidationTest extends TestCase
             $this->fail('Stored data that does not comply must be rejected.');
         } catch (InvalidOptionsException) {
             $this->assertSame(self::schema(), $vault->getSchema());
-            $this->assertSame('a.example.com', $vault->getString('host'));
-            $this->assertSame(993, $vault->getInt('port'));
+            $this->assertSame('a.example.com', $vault->getReader()->getString('host'));
+            $this->assertSame(993, $vault->getReader()->getInt('port'));
         }
     }
 
@@ -160,7 +160,7 @@ final class ContainerMutationValidationTest extends TestCase
         $vault = new Vault(['host' => 'a.example.com', 'extra' => 1], self::schema(), allowUndefinedKeys: true);
 
         $vault->validate();
-        $this->assertSame(1, $vault->getInt('extra'));
+        $this->assertSame(1, $vault->getReader()->getInt('extra'));
 
         $this->expectException(UndefinedOptionsException::class);
         $vault->validate(false);
@@ -173,7 +173,7 @@ final class ContainerMutationValidationTest extends TestCase
         $vault->validate();
         $vault->validate(true);
 
-        $this->assertSame('a.example.com', $vault->getString('host'));
+        $this->assertSame('a.example.com', $vault->getReader()->getString('host'));
     }
 
     public function testStoreSetRejectsAnInvalidValueAndKeepsTheStoredData(): void

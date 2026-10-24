@@ -28,7 +28,9 @@
         "php": "^8.5",
         "doctrine/collections": "^3.1",
         "derafu/selector": "dev-main",
-        "symfony/options-resolver": "^8.1"
+        "symfony/options-resolver": "^8.1",
+        "derafu/array": "dev-main",
+        "derafu/value": "dev-main"
     },
     "require-dev": {
         "ext-xdebug": "*",
