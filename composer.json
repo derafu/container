@@ -37,9 +37,7 @@
         "friendsofphp/php-cs-fixer": "^3.95",
         "phpstan/phpstan": "^2.3",
         "phpunit/phpunit": "^13.4",
-        "opis/json-schema": "^2.6",
-        "symfony/dependency-injection": "^8.1",
-        "symfony/config": "^8.1"
+        "opis/json-schema": "^2.6"
     },
     "scripts": {
         "docs": "php tools/phpdocumentor run --config=phpdoc.xml",
