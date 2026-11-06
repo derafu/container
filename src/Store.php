@@ -168,7 +168,9 @@ class Store extends AbstractContainer implements StoreInterface
         $error = $result->error();
         if ($error !== null) {
             $errors = [];
-            foreach ($this->formatter->format($error) as $section => $messages) {
+            /** @var array<string, list<string>> $formatted */
+            $formatted = $this->formatter->format($error);
+            foreach ($formatted as $section => $messages) {
                 foreach ($messages as $message) {
                     $errors[] = new TranslatableMessage(
                         '{message} in {section}.',
@@ -195,7 +197,21 @@ class Store extends AbstractContainer implements StoreInterface
      */
     private function applyDefaults(array $data, stdClass $schema): array
     {
-        foreach ($schema->properties as $key => $property) {
+        $properties = $schema->properties;
+        if (!$properties instanceof stdClass) {
+            throw new InvalidArgumentException([
+                'The properties of the container schema must be an object; {type} given.',
+                'type' => get_debug_type($properties),
+            ]);
+        }
+
+        foreach (get_object_vars($properties) as $key => $property) {
+            // Boolean schemas have no default value, other invalid schemas are
+            // rejected by the validator.
+            if (!$property instanceof stdClass) {
+                continue;
+            }
+
             // Apply the default value when the property is not set.
             if (!isset($data[$key]) && isset($property->default)) {
                 $data[$key] = $property->default;
@@ -205,7 +221,6 @@ class Store extends AbstractContainer implements StoreInterface
             if (
                 isset($data[$key])
                 && is_array($data[$key])
-                && $property instanceof stdClass
                 && isset($property->type)
                 && $property->type === 'object'
                 && isset($property->properties)

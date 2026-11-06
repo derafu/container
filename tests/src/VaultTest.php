@@ -17,6 +17,7 @@ use ArrayIterator;
 use ArrayObject;
 use Closure;
 use Derafu\Container\Vault;
+use Derafu\Value\ValueCaster;
 use IteratorAggregate;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -35,6 +36,13 @@ class VaultTest extends TestCase
      */
     public static function provideTestCases(): array
     {
+        /**
+         * @var array<string, array{
+         *     data: array<array-key, mixed>,
+         *     schema: array<array-key, mixed>,
+         *     expected: array<string, mixed>|class-string<Throwable>
+         * }> $tests
+         */
         $tests = require __DIR__ . '/../fixtures/vault.php';
 
         $testCases = [];
@@ -129,7 +137,7 @@ class VaultTest extends TestCase
     {
         switch ($normalizer) {
             case 'float':
-                return fn (Options $options, $value) => (float) $value;
+                return fn (Options $options, $value) => ValueCaster::toFloat($value);
             default:
                 return fn (Options $options, $value) => $value;
         }

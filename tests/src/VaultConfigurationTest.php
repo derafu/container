@@ -59,6 +59,22 @@ final class VaultConfigurationTest extends TestCase
                 'La entrada invalid de types del campo value debe ser string; se recibió ' . $type . '.',
             ];
         }
+        foreach ([true, 7, 'text', new stdClass()] as $value) {
+            $type = get_debug_type($value);
+            $cases['nested schema: ' . $type] = [
+                ['value' => ['schema' => $value]],
+                'The schema of field value must be an array; ' . $type . ' given.',
+                'El esquema del campo value debe ser un arreglo; se recibió ' . $type . '.',
+            ];
+        }
+        foreach ([true, 7, 'text', new stdClass()] as $value) {
+            $type = get_debug_type($value);
+            $cases['normalizer: ' . $type] = [
+                ['value' => ['normalizer' => $value]],
+                'The normalizer of field value must be a Closure; ' . $type . ' given.',
+                'El normalizador del campo value debe ser un Closure; se recibió ' . $type . '.',
+            ];
+        }
         foreach (['true', 'false', 0, 1, 0.0, [], new stdClass()] as $value) {
             $type = get_debug_type($value);
             $cases['undefined keys flag: ' . var_export($value, true)] = [

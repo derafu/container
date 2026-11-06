@@ -30,6 +30,13 @@ class StoreTest extends TestCase
      */
     public static function provideTestCases(): array
     {
+        /**
+         * @var array<string, array{
+         *     data: array<array-key, mixed>,
+         *     schema: array<array-key, mixed>,
+         *     expected: array<string, mixed>|class-string<Throwable>
+         * }> $tests
+         */
         $tests = require __DIR__ . '/../fixtures/store.php';
 
         $testCases = [];

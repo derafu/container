@@ -14,6 +14,7 @@ namespace Derafu\Container;
 
 use ArrayAccess;
 use ArrayObject;
+use Closure;
 use Derafu\Container\Abstract\AbstractContainer;
 use Derafu\Container\Contract\VaultInterface;
 use Derafu\Translation\Exception\Logic\TranslatableInvalidArgumentException;
@@ -185,20 +186,36 @@ class Vault extends AbstractContainer implements VaultInterface
 
             // Configure the normalizer for a nested schema.
             if (!empty($config['schema'])) {
+                $nestedSchema = $config['schema'];
+                if (!is_array($nestedSchema)) {
+                    throw new TranslatableInvalidArgumentException([
+                        'The schema of field {field} must be an array; {type} given.',
+                        'field' => $key,
+                        'type' => get_debug_type($nestedSchema),
+                    ]);
+                }
                 $resolver->setDefault($key, []);
                 $resolver->setAllowedTypes($key, 'array');
 
                 $resolver->setNormalizer(
                     $key,
-                    fn (Options $options, $value) =>
+                    fn (Options $options, array $value) =>
                         $this->resolve(
-                            $value ?? [],
-                            $config['schema'],
+                            $value,
+                            $nestedSchema,
                             $allowUndefinedKeys
                         )
                 );
             } elseif (!empty($config['normalizer'])) {
-                $resolver->setNormalizer($key, $config['normalizer']);
+                $normalizer = $config['normalizer'];
+                if (!$normalizer instanceof Closure) {
+                    throw new TranslatableInvalidArgumentException([
+                        'The normalizer of field {field} must be a Closure; {type} given.',
+                        'field' => $key,
+                        'type' => get_debug_type($normalizer),
+                    ]);
+                }
+                $resolver->setNormalizer($key, $normalizer);
             }
         }
 

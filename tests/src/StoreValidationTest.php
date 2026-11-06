@@ -40,6 +40,40 @@ final class StoreValidationTest extends TestCase
         ];
     }
 
+    /** @return array<string, array{mixed}> */
+    public static function invalidProperties(): array
+    {
+        return [
+            'empty array' => [[]],
+            'list' => [[['type' => 'string']]],
+            'string' => ['text'],
+            'int' => [7],
+            'bool' => [true],
+        ];
+    }
+
+    #[DataProvider('invalidProperties')]
+    public function testSchemaPropertiesMustBeAnObject(mixed $properties): void
+    {
+        $type = get_debug_type($properties);
+
+        try {
+            new Store([], ['properties' => $properties]);
+            $this->fail('The properties of a schema must be an object.');
+        } catch (TranslatableInvalidArgumentException $exception) {
+            $this->assertSame('The properties of the container schema must be an object; ' . $type . ' given.', $exception->getMessage());
+            $translator = TranslatorFactory::create('es', resourceProviders: [new ContainerTranslationResourceProvider()]);
+            $this->assertSame('Las propiedades del esquema del contenedor deben ser un objeto; se recibió ' . $type . '.', $exception->trans($translator));
+        }
+    }
+
+    public function testBooleanPropertySchemasHaveNoDefaultAndAreAccepted(): void
+    {
+        $store = new Store(['kept' => 1], ['properties' => ['allowed' => true]]);
+
+        $this->assertSame(['kept' => 1], $store->all());
+    }
+
     #[DataProvider('invalidJsonValues')]
     public function testInvalidJsonDataPreservesTheEncodingCause(mixed $value, int $errorCode): void
     {
