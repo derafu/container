@@ -240,13 +240,19 @@ abstract class AbstractContainer implements ContainerInterface
     /**
      * Creates a new ArrayCollection for use or assignment to $data.
      *
+     * A container is converted with its data (`all()`): only the data is
+     * copied, not its schema nor anything else of the container. An
+     * `ArrayAccess` that is not a container has to be `Traversable`.
+     *
      * @param array<array-key, mixed>|ArrayAccess<*, *>|ArrayObject<*, *> $data Source data.
      * @return ArrayCollection<array-key, mixed> New collection instance.
      */
     protected function createFrom(
         array|ArrayAccess|ArrayObject $data
     ): ArrayCollection {
-        if ($data instanceof ArrayObject) {
+        if ($data instanceof ContainerInterface) {
+            $data = $data->all();
+        } elseif ($data instanceof ArrayObject) {
             $data = (array) $data;
         } elseif ($data instanceof ArrayAccess) {
             if ($data instanceof Traversable) {
